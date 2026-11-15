@@ -13,8 +13,6 @@ variables:
     description: The catalog to use
   schema:
     description: The schema to use
-  deploy_sp:
-    description: Application ID of the deploying service principal
   # dev_group:
   #   default: <azaiml-developers-group>
 
@@ -26,16 +24,14 @@ targets:
     # See also https://docs.databricks.com/dev-tools/bundles/deployment-modes.html.
     mode: development
     default: true
+    workspace:
+      host: https://adb-7405612997787606.6.azuredatabricks.net
     permissions:
       - level: CAN_MANAGE
-        service_principal_name: ${var.deploy_sp}
-      # - level: CAN_MANAGE
-      #   group_name: ${var.dev_group}
-      - level: CAN_MANAGE
-        user_name: rishabh.singh15.ext@proximus.com
+        user_name: mridul.raj@proximus.com
     variables:
-      catalog: pxs_azaiml_dbr_dft_d_gwc_dbws_0_7405612340831593
-      schema: information_schema
+      catalog: dbx_dev_test
+      schema: osix_decoders
   # prod:
   #   mode: production
   #   permissions:
