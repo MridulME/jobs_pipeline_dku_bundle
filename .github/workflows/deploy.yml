@@ -1,0 +1,48 @@
+# This workflow validates, deploys, and runs the specified bundle
+# within a develoment target named "dev".
+name: 'Jobs Deployment'
+
+# Ensure that only a single job or workflow using the same concurrency group
+# runs at a time.
+concurrency: 1
+
+# Trigger this workflow whenever a pull request is pushed to the repo's
+# main branch.
+on:
+  push:
+    branches:
+      - dev
+    paths:
+      - 'jobs_pipeline_dku_bundle/**'
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    name: 'Deploy bundle'
+    runs-on: UbuntuLatest
+    environment: dev
+
+    steps:
+      # Check out this repo, so that this workflow can access it.
+      - uses: actions/checkout@v3
+
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - uses: databricks/setup-cli@main
+
+      # Deploy the bundle to the "dev" target as defined
+      # in the bundle's settings file.
+      - run: databricks bundle deploy
+        working-directory: jobs_pipeline_dku_bundle
+        env:
+          DATABRICKS_AUTH_TYPE: azure-cli
+          DATABRICKS_HOST: ${{ vars.DATABRICKS_HOST }}
+          DATABRICKS_BUNDLE_ENV: dev
+          BUNDLE_VAR_deploy_sp: ${{ vars.AZURE_CLIENT_ID }}
